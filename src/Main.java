@@ -1,6 +1,5 @@
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.Select;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -11,11 +10,11 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        String url = "http://pcairnoise.com/bayonne/admin/?ss=fieldreport&id=1303&arean=3&paraml=L1&lookupdate=2018-02-19";
+        String url = "http://pcairnoise.com/bayonne/admin/?ss=fieldreport&id=1308&arean=3&paraml=L1&lookupdate=2018-02-21";
         String [] inputs = {"1", "85 Newark Ave", "Generator, manlift, hand tools. Acoustic noise blankets lining the eastern and western perimeters of the work site.","Light traffic on Newark Avenue."};
-        int intervals = 8;
+        int intervals = 4;
         String [] times = new String [intervals*2];
-        double [] data = readCSVFile("/home/trevorsimpkin/IdeaProjects/RobotNCO/first.rnd","2018/02/20 10:30:00",intervals, times);
+        double [] data = readCSVFile("/home/trevorsimpkin/IdeaProjects/RobotNCO/FEB20.rnd","2018/02/21 07:40:00",intervals, times);
         /*for (int i = 0; i < data.length; i++) {
             System.out.println(times[i]);
             System.out.println(data[i]);
@@ -28,15 +27,14 @@ public class Main {
         System.setProperty("webdriver.chrome.driver", exePath);
         WebDriver driver = new ChromeDriver();
         driver.get(url);
-        login(driver);
+        login(driver, "trevor", input[1]); //replace with password
         driver.get(url);
         WebElement moreLinesLink = driver.findElement(By.linkText("Show more lines..."));
-        //*[@id="main"]/div[1]/div/form[2]/table[1]/tbody/tr[21]/td/a
         moreLinesLink.click();
+        //moreLinesLink.click(); //extra lines -- could input if statements but only if performance suffers.
         int id = 1;
         WebElement element=driver.findElement(By.xpath("//input[@name='sitenumber" + id + "']"));
         String value = element.getAttribute("value");
-        //Get first open line in report
         while (!value.equals("")) {
             id++;
             element=driver.findElement(By.xpath("//input[@name='sitenumber" + id + "']"));
@@ -49,10 +47,6 @@ public class Main {
             dropdownLink.click();
             WebElement dropdown= driver.findElement(By.cssSelector("#main > div.row > div > form:nth-child(14) > table:nth-child(3) > tbody > tr:nth-child("+(id+1)+") > td:nth-child(2) > div > ul > li:nth-child(19)"));
             dropdown.click();
-            //Select dropdown = new Select (driver.findElement(By.xpath("//select[@name='monitoringlocation" + id + "']")));;
-            //dropdown.selectByVisibleText(input[1]);
-            //System.out.println(input[1]);
-            //dropdown.sendKeys("85 Newark Ave");
             WebElement startTimeElement=driver.findElement(By.xpath("//input[@name='locationtimeperiodstart" + id + "']"));
             startTimeElement.sendKeys(times[j]);
             WebElement endTimeElement=driver.findElement(By.xpath("//input[@name='locationtimeperiodend" + id + "']"));
@@ -67,11 +61,11 @@ public class Main {
 
         }
     }
-    public static void login(WebDriver driver) {
+    public static void login(WebDriver driver, String username, String password) {
         WebElement usernameElement=driver.findElement(By.xpath("//input[@name='user_name']"));
-        usernameElement.sendKeys("trevor");
+        usernameElement.sendKeys(username);
         WebElement passwordElement=driver.findElement(By.xpath("//input[@name='user_password']"));
-        passwordElement.sendKeys("trev8790");
+        passwordElement.sendKeys(password);
         WebElement button=driver.findElement(By.xpath("//input[@name='submit']"));
         button.click();
     }
